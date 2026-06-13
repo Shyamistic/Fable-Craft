@@ -1,1 +1,10 @@
-[{"origin": ["*"], "method": ["GET", "POST"], "maxAgeSeconds": 3600}]
+{
+  "CORSRules": [
+    {
+      "AllowedOrigins": ["*"],
+      "AllowedMethods": ["GET", "POST", "PUT"],
+      "AllowedHeaders": ["*"],
+      "MaxAgeSeconds": 3600
+    }
+  ]
+}
