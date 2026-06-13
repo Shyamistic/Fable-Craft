@@ -34,6 +34,9 @@ export default function GenreSelector({ onGenreSelected, initialGenre = null }: 
   const handleSelect = (genreId: Genre) => {
     setSelectedGenre(genreId)
     onGenreSelected(genreId)
+    pendo.track('genre_selected', {
+      genre_id: genreId,
+    })
   }
 
   /**

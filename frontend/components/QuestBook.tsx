@@ -61,7 +61,12 @@ export default function QuestBook({ quest, onQuestComplete }: QuestBookProps) {
       next.add(currentSceneIndex)
       return next
     })
-  }, [currentSceneIndex])
+    pendo.track('scene_completed', {
+      scene_number: currentSceneIndex + 1,
+      is_correct: true,
+      total_scenes: totalScenes,
+    })
+  }, [currentSceneIndex, totalScenes])
 
   /**
    * Called when the 8-second countdown finishes. Advances to next scene

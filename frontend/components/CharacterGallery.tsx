@@ -62,8 +62,13 @@ export default function CharacterGallery({
   const handleSelect = useCallback(
     (character: GalleryEntry) => {
       onCharacterSelected(character)
+      pendo.track('character_selected_from_gallery', {
+        character_id: character.id,
+        character_name: character.name,
+        gallery_size: characters.length,
+      })
     },
-    [onCharacterSelected]
+    [onCharacterSelected, characters.length]
   )
 
   // Empty state (Requirement 10.5)

@@ -116,6 +116,11 @@ export default function ParentDashboard({
         setAuthenticated(true)
         setError('')
         setAttempts(0)
+        pendo.track('parent_dashboard_accessed', {
+          quests_completed: stats.quests_completed,
+          total_coins: stats.total_coins,
+          characters_created: stats.characters_created,
+        })
       } else {
         const newAttempts = attempts + 1
         setAttempts(newAttempts)

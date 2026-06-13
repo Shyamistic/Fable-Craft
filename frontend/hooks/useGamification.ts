@@ -73,6 +73,10 @@ export function useGamification() {
       let newLevel = prev.level
       while (newXP >= xpForLevel(newLevel + 1)) {
         newLevel++
+        pendo.track('level_up', {
+          new_level: newLevel,
+          total_xp: newXP,
+        })
       }
       return { ...prev, xp: newXP, level: newLevel }
     })
@@ -128,6 +132,13 @@ export function useGamification() {
           progress: updatedChallenge.progress + 1,
           completed: updatedChallenge.progress + 1 >= updatedChallenge.target,
         }
+        if (updatedChallenge.completed) {
+          pendo.track('weekly_challenge_completed', {
+            challenge_type: updatedChallenge.type,
+            challenge_title: updatedChallenge.title,
+            challenge_target: updatedChallenge.target,
+          })
+        }
       }
 
       return {
@@ -172,6 +183,12 @@ export function useGamification() {
       const unlocked = evaluateAchievements(prev)
       if (unlocked.length > 0) {
         setNewlyUnlocked(unlocked)
+        unlocked.forEach(a => {
+          pendo.track('achievement_unlocked', {
+            achievement_id: a.id,
+            achievement_title: a.title,
+          })
+        })
       }
       return { ...prev, achievements: [...prev.achievements] }
     })
@@ -184,6 +201,14 @@ export function useGamification() {
   const addToBookshelf = useCallback((entry: BookshelfEntry) => {
     setState(prev => {
       const updated = [entry, ...prev.bookshelf].slice(0, MAX_BOOKSHELF)
+      pendo.track('quest_added_to_bookshelf', {
+        quest_id: entry.questId,
+        quest_title: entry.title,
+        character_name: entry.characterName,
+        genre: entry.genre,
+        coins_earned: entry.coinsEarned,
+        bookshelf_size: updated.length,
+      })
       return { ...prev, bookshelf: updated }
     })
   }, [])
