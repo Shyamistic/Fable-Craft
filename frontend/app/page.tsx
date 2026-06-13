@@ -124,7 +124,7 @@ export default function Page() {
     setError('')
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || ''
 
       const response = await fetch(`${apiUrl}/api/quests/generate`, {
         method: 'POST',
@@ -236,7 +236,7 @@ export default function Page() {
         return (
           <CharacterStudio
             sessionId={sessionId}
-            apiBaseUrl={process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}
+            apiBaseUrl={process.env.NEXT_PUBLIC_API_URL || ''}
             onCharacterGenerated={handleCharacterGenerated}
           />
         )
@@ -608,7 +608,7 @@ export default function Page() {
             >
               <OnboardingFlow
                 sessionId={sessionId}
-                apiBaseUrl={process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}
+                apiBaseUrl={process.env.NEXT_PUBLIC_API_URL || ''}
                 onComplete={handleOnboardingComplete}
                 renderStepContent={renderStepContent}
               />
