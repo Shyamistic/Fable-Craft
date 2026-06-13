@@ -2,16 +2,9 @@
 const nextConfig = {
   output: 'standalone',
   env: {
-    NEXT_PUBLIC_API_URL: '',
-  },
-  async rewrites() {
-    const backendUrl = process.env.BACKEND_URL || 'http://localhost:8080'
-    return [
-      {
-        source: '/api/:path*',
-        destination: `${backendUrl}/api/:path*`,
-      },
-    ]
+    // Set at build time. On EC2: same IP, port 8080.
+    // On Amplify/HTTPS: leave empty and use rewrites.
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || '',
   },
 }
 
