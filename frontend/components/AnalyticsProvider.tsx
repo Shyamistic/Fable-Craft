@@ -78,6 +78,14 @@ export function AnalyticsProvider({ children }: AnalyticsProviderProps) {
 
     sessionId = generateSessionId()
 
+    // Initialize Pendo SDK with anonymous visitor
+    pendo.initialize({
+      visitor: {
+        id: '',
+        sessionId: sessionId,
+      }
+    })
+
     // Attach global event dispatcher for use throughout the app
     window.trackEvent = (
       eventName: TrackedEventName,
