@@ -32,6 +32,11 @@ export function useBackgroundMusic(genre: Genre | 'menu' | null) {
     const url = MUSIC_URLS[genre] || MUSIC_URLS['menu']
 
     if (audioRef.current) {
+      // If same track is already loaded, just resume
+      if (audioRef.current.src.endsWith(url.split('/').pop() || '')) {
+        audioRef.current.play().then(() => setIsPlaying(true)).catch(() => {})
+        return
+      }
       audioRef.current.pause()
     }
 
@@ -39,14 +44,17 @@ export function useBackgroundMusic(genre: Genre | 'menu' | null) {
       const audio = new Audio(url)
       audio.loop = true
       audio.volume = isDucked ? DUCKED_VOLUME : volume
+      audio.preload = 'auto'
       audioRef.current = audio
 
-      audio.play()
-        .then(() => setIsPlaying(true))
-        .catch(() => {
-          // Autoplay blocked or file not available - fail silently
-          setIsPlaying(false)
-        })
+      // Wait for enough data to buffer before playing to avoid stuttering
+      audio.addEventListener('canplaythrough', () => {
+        audio.play()
+          .then(() => setIsPlaying(true))
+          .catch(() => setIsPlaying(false))
+      }, { once: true })
+
+      audio.load()
     } catch {
       setIsPlaying(false)
     }

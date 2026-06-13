@@ -35,6 +35,7 @@ import {
   getPersistedParentStats,
   getPersistedRecentQuests,
   getPersistedGallery,
+  addCharacterToGallery,
 } from '@/lib/persistence'
 
 /**
@@ -100,6 +101,15 @@ export default function Page() {
     setError('')
     gamification.awardXP(25)
     gamification.incrementCharacters()
+
+    // Save character to persistent gallery
+    addCharacterToGallery({
+      id: character.id,
+      name: character.name,
+      generated_image_url: character.generated_image_url,
+      original_drawing_url: character.original_drawing_url,
+      created_at: character.created_at,
+    })
   }, [gamification])
 
   // ─── Lesson Selection callback ──────────────────────────────────────────
