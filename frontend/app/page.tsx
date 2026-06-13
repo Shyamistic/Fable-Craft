@@ -81,10 +81,9 @@ export default function Page() {
   }, [])
 
   // Auto-play music when entering quest view (genre changes)
+  // Music only starts when user clicks the play button
   useEffect(() => {
-    if (activeView === 'quest' && questData && !musicPlaying) {
-      playMusic()
-    }
+    // Do nothing - music is user-initiated only
   }, [activeView, questData])
 
   // Check achievements whenever relevant state changes
