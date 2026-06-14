@@ -18,29 +18,19 @@ export function useBackgroundMusic(genre: Genre | 'menu' | null) {
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const [isPlaying, setIsPlaying] = useState(false)
   const isMutedRef = useRef(false)
+  const currentGenreRef = useRef<string | null>(null)
 
-  // Stop and destroy the current audio completely
-  const destroyAudio = useCallback(() => {
+  // Core function to start a track
+  const startTrack = useCallback((targetGenre: string) => {
+    if (isMutedRef.current) return
+    const url = MUSIC_URLS[targetGenre] || MUSIC_URLS['menu']
+
+    // Destroy existing audio
     if (audioRef.current) {
       audioRef.current.pause()
       audioRef.current.src = ''
-      audioRef.current.load()
       audioRef.current = null
     }
-    setIsPlaying(false)
-  }, [])
-
-  const play = useCallback(() => {
-    if (!genre || isMutedRef.current) return
-    const url = MUSIC_URLS[genre] || MUSIC_URLS['menu']
-
-    // If already playing the same track, do nothing
-    if (audioRef.current && !audioRef.current.paused) {
-      return
-    }
-
-    // Destroy any existing audio first
-    destroyAudio()
 
     try {
       const audio = new Audio(url)
@@ -48,22 +38,39 @@ export function useBackgroundMusic(genre: Genre | 'menu' | null) {
       audio.volume = NORMAL_VOLUME
       audio.preload = 'auto'
       audioRef.current = audio
+      currentGenreRef.current = targetGenre
 
-      const playPromise = audio.play()
-      if (playPromise) {
-        playPromise
-          .then(() => setIsPlaying(true))
-          .catch(() => setIsPlaying(false))
-      }
+      audio.play()
+        .then(() => setIsPlaying(true))
+        .catch(() => setIsPlaying(false))
     } catch {
       setIsPlaying(false)
     }
-  }, [genre, destroyAudio])
+  }, [])
+
+  const play = useCallback(() => {
+    if (!genre) return
+    isMutedRef.current = false
+    startTrack(genre)
+  }, [genre, startTrack])
 
   const stop = useCallback(() => {
     isMutedRef.current = true
-    destroyAudio()
-  }, [destroyAudio])
+    if (audioRef.current) {
+      audioRef.current.pause()
+      audioRef.current.src = ''
+      audioRef.current = null
+    }
+    currentGenreRef.current = null
+    setIsPlaying(false)
+  }, [])
+
+  // When genre changes and music is currently playing, switch track automatically
+  useEffect(() => {
+    if (genre && isPlaying && !isMutedRef.current && currentGenreRef.current !== genre) {
+      startTrack(genre)
+    }
+  }, [genre, isPlaying, startTrack])
 
   // Cleanup on unmount
   useEffect(() => {

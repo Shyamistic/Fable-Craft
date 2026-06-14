@@ -78,12 +78,25 @@ export default function Page() {
   useEffect(() => {
     setSessionId(generateSessionId())
     gamification.recordActivity()
+
+    // Preload all background images so they appear instantly on view change
+    const bgImages = [
+      '/backgrounds/prompt1.png', '/backgrounds/prompt2.png',
+      '/backgrounds/prompt3.png', '/backgrounds/prompt4.png',
+      '/backgrounds/prompt5.png', '/backgrounds/prompt6.png',
+      '/backgrounds/prompt7.png', '/backgrounds/prompt8.png',
+    ]
+    bgImages.forEach(src => {
+      const img = new Image()
+      img.src = src
+    })
   }, [])
 
-  // Auto-play music when entering quest view (genre changes)
-  // Music only starts when user clicks the play button
+  // Auto-play music when entering quest view (if music was already playing)
   useEffect(() => {
-    // Do nothing - music is user-initiated only
+    if (activeView === 'quest' && questData && musicPlaying) {
+      // Genre change triggers auto-switch in the hook
+    }
   }, [activeView, questData])
 
   // Check achievements whenever relevant state changes
