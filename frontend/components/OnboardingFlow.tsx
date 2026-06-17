@@ -254,7 +254,7 @@ export default function OnboardingFlow({
         ) : (
           <button
             onClick={nextStep}
-            disabled={isTransitioning}
+            disabled={isTransitioning || currentStepIndex < 3}
             className="px-6 py-3 rounded-lg font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
             style={{
               backgroundColor: BRAND_COLORS.primary,
