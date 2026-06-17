@@ -289,12 +289,14 @@ const DrawingCanvas = forwardRef<DrawingCanvasHandle, DrawingCanvasProps>(
 
     // ─── Tools ─────────────────────────────────────────────────────────────
     const handleUndo = useCallback(() => {
-      if (strokes.length === 0) return
-      const newStrokes = strokes.slice(0, -1)
-      setStrokes(newStrokes)
-      redrawCanvas(newStrokes)
-      notifyChange()
-    }, [strokes, redrawCanvas, notifyChange])
+      setStrokes(prev => {
+        if (prev.length === 0) return prev
+        const newStrokes = prev.slice(0, -1)
+        redrawCanvas(newStrokes)
+        notifyChange()
+        return newStrokes
+      })
+    }, [redrawCanvas, notifyChange])
 
     const handleClear = useCallback(() => {
       setStrokes([])

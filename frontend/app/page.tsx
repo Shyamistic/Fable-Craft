@@ -256,11 +256,16 @@ export default function Page() {
       case 'name':
       case 'generate':
         return (
-          <CharacterStudio
-            sessionId={sessionId}
-            apiBaseUrl={process.env.NEXT_PUBLIC_API_URL || ''}
-            onCharacterGenerated={handleCharacterGenerated}
-          />
+          <div>
+            <CharacterStudio
+              sessionId={sessionId}
+              apiBaseUrl={process.env.NEXT_PUBLIC_API_URL || ''}
+              onCharacterGenerated={handleCharacterGenerated}
+            />
+            {/* Hide the OnboardingFlow Next/Back buttons during character creation
+                since CharacterStudio has its own internal navigation */}
+            <style>{`.onboarding-nav { display: none !important; }`}</style>
+          </div>
         )
 
       case 'lesson':
