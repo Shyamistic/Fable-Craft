@@ -633,6 +633,7 @@ export default function Page() {
                 apiBaseUrl={process.env.NEXT_PUBLIC_API_URL || ''}
                 onComplete={handleOnboardingComplete}
                 renderStepContent={renderStepContent}
+                forceStep={generatedCharacter ? 'lesson' : null}
               />
             </div>
           )}

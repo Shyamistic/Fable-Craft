@@ -292,8 +292,7 @@ const DrawingCanvas = forwardRef<DrawingCanvasHandle, DrawingCanvasProps>(
       setStrokes(prev => {
         if (prev.length === 0) return prev
         const newStrokes = prev.slice(0, -1)
-        // Schedule redraw after state update
-        setTimeout(() => redrawCanvas(newStrokes), 0)
+        setTimeout(() => redrawCanvas(newStrokes), 1000)
         return newStrokes
       })
       notifyChange()

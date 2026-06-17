@@ -29,6 +29,8 @@ interface OnboardingFlowProps {
   sessionId: string
   /** Callback for rendering custom content for each step */
   renderStepContent: (step: OnboardingStep, data: OnboardingFlowData) => React.ReactNode
+  /** Force-skip to a specific step (used after character generation) */
+  forceStep?: OnboardingStep | null
 }
 
 export interface OnboardingFlowData {
@@ -43,9 +45,9 @@ export interface OnboardingFlowData {
  * Step metadata: label, icon, description
  */
 const STEPS: Record<OnboardingStep, { label: string; emoji: string; description: string }> = {
-  draw: { label: 'Draw', emoji: '✏️', description: 'Create your character' },
-  name: { label: 'Name', emoji: '📝', description: 'Give your character a name' },
-  generate: { label: 'Create', emoji: '✨', description: 'AI generates your character' },
+  draw: { label: 'Create', emoji: '🎨', description: 'Draw and create your character' },
+  name: { label: 'Create', emoji: '🎨', description: 'Draw and create your character' },
+  generate: { label: 'Create', emoji: '🎨', description: 'Draw and create your character' },
   lesson: { label: 'Lesson', emoji: '📖', description: 'Pick something to learn' },
   genre: { label: 'Genre', emoji: '🎬', description: 'Choose your world' },
   play: { label: 'Play', emoji: '🎮', description: 'Start your adventure!' },
@@ -53,11 +55,20 @@ const STEPS: Record<OnboardingStep, { label: string; emoji: string; description:
 
 const STEP_ORDER: OnboardingStep[] = ['draw', 'name', 'generate', 'lesson', 'genre', 'play']
 
+/** Visible step indicators (collapsed draw/name/generate into one) */
+const VISIBLE_STEPS: { step: OnboardingStep; label: string; emoji: string }[] = [
+  { step: 'draw', label: 'Create', emoji: '🎨' },
+  { step: 'lesson', label: 'Lesson', emoji: '📖' },
+  { step: 'genre', label: 'Genre', emoji: '🎬' },
+  { step: 'play', label: 'Play', emoji: '🎮' },
+]
+
 export default function OnboardingFlow({
   onComplete,
   apiBaseUrl = '',
   sessionId,
   renderStepContent,
+  forceStep,
 }: OnboardingFlowProps) {
   const [currentStep, setCurrentStep] = useState<OnboardingStep>('draw')
   const [isTransitioning, setIsTransitioning] = useState(false)
@@ -70,6 +81,13 @@ export default function OnboardingFlow({
   })
 
   const transitionTimerRef = useRef<NodeJS.Timeout | null>(null)
+
+  // Force-advance to a step when parent says so (e.g., after character generation)
+  useEffect(() => {
+    if (forceStep && forceStep !== currentStep) {
+      setCurrentStep(forceStep)
+    }
+  }, [forceStep])
 
   /**
    * Transition to the next step with animation.
@@ -137,31 +155,27 @@ export default function OnboardingFlow({
     <div className="flex flex-col gap-8 w-full max-w-4xl mx-auto p-4" data-testid="onboarding-flow">
       {/* Step Indicator Bar */}
       <div className="flex justify-between items-center gap-2">
-        {STEP_ORDER.map((step, index) => {
-          const isActive = step === currentStep
-          const isCompleted = STEP_ORDER.indexOf(step) < currentStepIndex
-          const stepData = STEPS[step]
+        {VISIBLE_STEPS.map((vs, index) => {
+          // Determine if this visible step is active or completed
+          const stepIndex = STEP_ORDER.indexOf(vs.step)
+          const isActive = currentStepIndex >= stepIndex && 
+            (index === VISIBLE_STEPS.length - 1 || currentStepIndex < STEP_ORDER.indexOf(VISIBLE_STEPS[index + 1]?.step || 'play'))
+          const isCompleted = index < VISIBLE_STEPS.length - 1 && 
+            currentStepIndex >= STEP_ORDER.indexOf(VISIBLE_STEPS[index + 1].step)
 
           return (
             <div
-              key={step}
+              key={vs.step}
               className="flex-1 flex flex-col items-center gap-2"
-              data-testid={`step-indicator-${step}`}
+              data-testid={`step-indicator-${vs.step}`}
             >
               {/* Step Circle */}
-              <button
-                onClick={() => {
-                  // Allow clicking on completed steps to go back
-                  if (isCompleted || isActive) {
-                    goToStep(step)
-                  }
-                }}
-                disabled={!isCompleted && !isActive}
+              <div
                 className={`flex items-center justify-center w-12 h-12 rounded-full font-bold text-lg transition-all duration-300 ${
                   isActive
                     ? 'scale-125 ring-4'
                     : isCompleted
-                      ? 'hover:scale-110 cursor-pointer'
+                      ? ''
                       : 'opacity-40'
                 }`}
                 style={{
@@ -169,11 +183,11 @@ export default function OnboardingFlow({
                   color: isActive || isCompleted ? 'white' : '#9CA3AF',
                   boxShadow: isActive ? `0 0 0 4px ${BRAND_COLORS.primary}40` : 'none',
                 }}
-                aria-label={`Step ${index + 1}: ${stepData.label}`}
+                aria-label={`Step ${index + 1}: ${vs.label}`}
                 aria-current={isActive ? 'step' : undefined}
               >
-                {isCompleted ? '✓' : index + 1}
-              </button>
+                {isCompleted ? '✓' : vs.emoji}
+              </div>
 
               {/* Step Label */}
               <div className="text-center">
@@ -182,12 +196,12 @@ export default function OnboardingFlow({
                     isActive ? 'text-gray-900' : isCompleted ? 'text-gray-600' : 'text-gray-400'
                   }`}
                 >
-                  {stepData.label}
+                  {vs.label}
                 </p>
               </div>
 
               {/* Connector Line (between steps) */}
-              {index < STEP_ORDER.length - 1 && (
+              {index < VISIBLE_STEPS.length - 1 && (
                 <div
                   className="h-1 flex-1 transition-colors duration-300"
                   style={{
@@ -254,7 +268,7 @@ export default function OnboardingFlow({
         ) : (
           <button
             onClick={nextStep}
-            disabled={isTransitioning || currentStepIndex < 3}
+            disabled={isTransitioning}
             className="px-6 py-3 rounded-lg font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
             style={{
               backgroundColor: BRAND_COLORS.primary,
