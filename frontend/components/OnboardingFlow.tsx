@@ -221,7 +221,7 @@ export default function OnboardingFlow({
       </div>
 
       {/* Navigation Buttons */}
-      <div className="flex gap-3 justify-between onboarding-nav">
+      <div className="flex gap-3 justify-between">
         <button
           onClick={previousStep}
           disabled={currentStepIndex === 0 || isTransitioning}

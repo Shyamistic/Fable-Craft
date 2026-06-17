@@ -112,7 +112,9 @@ export default function ParentDashboard({
 
       if (isLockedOut) return
 
-      if (pinInput === pin) {
+      // Accept the input if it matches the stored PIN, or '1234' if no PIN is set
+      const validPin = pin || '1234'
+      if (pinInput === validPin) {
         setAuthenticated(true)
         setError('')
         setAttempts(0)
