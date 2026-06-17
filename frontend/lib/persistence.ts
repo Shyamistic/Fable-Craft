@@ -33,7 +33,7 @@ export function getDefaultSession(): PersistedSession {
     version: PERSISTENCE_SCHEMA_VERSION,
     character_gallery: [],
     active_quest: null,
-    parent_pin: '',
+    parent_pin: '1234',
     parent_stats: {
       quests_completed: 0,
       unique_lessons: [],
