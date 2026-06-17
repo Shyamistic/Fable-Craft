@@ -84,7 +84,7 @@ export default function LessonSelector({
     setValidationError(null)
 
     try {
-      const response = await fetch('/api/lessons/validate', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/lessons/validate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
