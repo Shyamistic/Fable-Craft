@@ -295,8 +295,8 @@ const DrawingCanvas = forwardRef<DrawingCanvasHandle, DrawingCanvasProps>(
         redrawCanvas(newStrokes)
         return newStrokes
       })
-      notifyChange()
-    }, [redrawCanvas, notifyChange])
+      // Don't call notifyChange during undo to avoid parent re-render/remount
+    }, [redrawCanvas])
 
     const handleClear = useCallback(() => {
       setStrokes([])

@@ -192,8 +192,10 @@ export default function Page() {
   }
 
   // ─── Quest completion ───────────────────────────────────────────────────
-  const handleQuestComplete = useCallback(() => {
+  const handleQuestComplete = useCallback((coinsEarned?: number) => {
+    const coins = coinsEarned || 0
     gamification.awardXP(100)
+    if (coins === 8) gamification.markPerfectQuest()
     gamification.incrementQuests(selectedGenre)
 
     // Add to bookshelf
@@ -204,7 +206,7 @@ export default function Page() {
         characterName: questData.character_name,
         genre: questData.genre,
         completedAt: new Date().toISOString(),
-        coinsEarned: 0, // Will be updated by QuestBook
+        coinsEarned: coins,
         coverImageUrl: questData.scenes?.[0]?.image_url || '',
       })
     }
@@ -214,6 +216,8 @@ export default function Page() {
     setSelectedGenre('fantasy_kingdom')
     setQuestData(null)
     setError('')
+    setCharacterJustGenerated(false)
+    setForceGenreStep(false)
     setActiveView('home')
   }, [gamification, selectedGenre, questData])
 
