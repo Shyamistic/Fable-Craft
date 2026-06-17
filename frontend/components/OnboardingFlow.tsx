@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useCallback, useRef } from 'react'
+import React, { useState, useCallback, useRef, useEffect } from 'react'
 import { BRAND_COLORS } from '../lib/branding'
 import { TRANSITION_DURATION_MIN_MS, TRANSITION_DURATION_MAX_MS } from '../lib/constants'
 import type { Character, Genre, Quest } from '../lib/types'
