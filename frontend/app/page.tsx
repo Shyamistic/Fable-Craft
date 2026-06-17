@@ -125,9 +125,9 @@ export default function Page() {
       created_at: character.created_at,
     })
 
-    // Delay the forceStep so user can see the generated character for 3 seconds
+    // Delay the forceStep so user can see the generated character
     setCharacterJustGenerated(false)
-    setTimeout(() => setCharacterJustGenerated(true), 3000)
+    setTimeout(() => setCharacterJustGenerated(true), 18000)
   }, [gamification])
 
   // ─── Lesson Selection callback ──────────────────────────────────────────

@@ -11,8 +11,8 @@ const MUSIC_URLS: Record<string, string> = {
   menu: '/audio/sigmamusicart-kids-happy-background-music-401734 (1).mp3',
 }
 
-const NORMAL_VOLUME = 0.15
-const DUCKED_VOLUME = 0.05
+const NORMAL_VOLUME = 0.35
+const DUCKED_VOLUME = 0.1
 
 export function useBackgroundMusic(genre: Genre | 'menu' | null) {
   const audioRef = useRef<HTMLAudioElement | null>(null)
