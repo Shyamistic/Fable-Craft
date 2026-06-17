@@ -105,6 +105,8 @@ export default function Page() {
   }, [gamification.questsCompleted, gamification.charactersCreated, gamification.streak.current])
 
   // ─── Character Studio callback ──────────────────────────────────────────
+  const [characterJustGenerated, setCharacterJustGenerated] = useState(false)
+
   const handleCharacterGenerated = useCallback((character: Character) => {
     setGeneratedCharacter(character)
     setSelectedLesson('')
@@ -122,12 +124,24 @@ export default function Page() {
       original_drawing_url: character.original_drawing_url,
       created_at: character.created_at,
     })
+
+    // Delay the forceStep so user can see the generated character for 3 seconds
+    setCharacterJustGenerated(false)
+    setTimeout(() => setCharacterJustGenerated(true), 3000)
   }, [gamification])
 
   // ─── Lesson Selection callback ──────────────────────────────────────────
   const handleLessonSelected = useCallback((lesson: string) => {
     setSelectedLesson(lesson)
+    // Auto-advance to genre step after lesson selection (small delay for visual feedback)
+    setCharacterJustGenerated(false) // Reset so forceStep doesn't interfere
+    setTimeout(() => {
+      // Force step to genre
+      setForceGenreStep(true)
+    }, 500)
   }, [])
+
+  const [forceGenreStep, setForceGenreStep] = useState(false)
 
   // ─── Genre Selection callback ───────────────────────────────────────────
   const handleGenreSelected = useCallback((genre: Genre) => {
@@ -633,7 +647,7 @@ export default function Page() {
                 apiBaseUrl={process.env.NEXT_PUBLIC_API_URL || ''}
                 onComplete={handleOnboardingComplete}
                 renderStepContent={renderStepContent}
-                forceStep={generatedCharacter ? 'lesson' : null}
+                forceStep={forceGenreStep ? 'genre' : characterJustGenerated ? 'lesson' : null}
               />
             </div>
           )}
