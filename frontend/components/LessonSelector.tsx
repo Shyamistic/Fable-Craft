@@ -60,6 +60,10 @@ export default function LessonSelector({
       // Proceed within 2 seconds (using 1.5s for a smooth UX)
       proceedTimerRef.current = setTimeout(() => {
         onLessonSelected(lesson.id)
+        pendo.track('lesson_selected', {
+          lesson_id: lesson.id,
+          is_custom: false,
+        })
       }, 1500)
     },
     [onLessonSelected],
@@ -108,12 +112,20 @@ export default function LessonSelector({
         // Validated successfully — proceed with sanitized lesson
         setSelectedLesson('custom')
         onLessonSelected(data.sanitized_lesson || trimmed)
+        pendo.track('lesson_selected', {
+          lesson_id: 'custom',
+          is_custom: true,
+        })
       } else {
         // Requirement 4.5: not age-appropriate → child-friendly message + redirect to predefined
         setValidationError(
           "Let's pick a different topic! How about one of the fun lessons below?",
         )
       }
+      pendo.track('custom_lesson_validated', {
+        is_appropriate: data.is_appropriate,
+        lesson_length: trimmed.length,
+      })
     } catch {
       // Requirement 4.6: network/timeout failure → show retry + predefined option
       setValidationError(

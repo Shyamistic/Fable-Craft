@@ -76,6 +76,10 @@ export default function ImageUploader({ onImageReady }: ImageUploaderProps) {
         const base64Data = e.target?.result as string
         setPreview(base64Data)
         onImageReady(base64Data)
+        pendo.track('image_uploaded', {
+          file_type: file.type,
+          file_size_bytes: file.size,
+        })
       }
       reader.onerror = () => {
         setError('Something went wrong reading your picture. Please try again!')

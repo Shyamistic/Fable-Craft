@@ -63,6 +63,9 @@ export default function CharacterStudio({
 
     setImageData(data)
     setStep('preview')
+    pendo.track('drawing_completed', {
+      input_mode: inputMode,
+    })
   }, [inputMode, imageData])
 
   // ─── Handle image upload ───────────────────────────────────────────────
@@ -128,6 +131,13 @@ export default function CharacterStudio({
       setGeneratedCharacter(character)
       setStep('result')
       onCharacterGenerated?.(character)
+      pendo.track('character_generated', {
+        character_name: character.name,
+        character_type: character.character_type,
+        mood: character.mood,
+        artistic_style: character.artistic_style || '',
+        input_mode: inputMode,
+      })
     } catch {
       setErrorMessage(
         "Oh no! We couldn't reach the character creator right now. Please try again in a moment!"

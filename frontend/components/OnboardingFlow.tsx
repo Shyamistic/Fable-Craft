@@ -117,6 +117,11 @@ export default function OnboardingFlow({
     } else {
       // Flow complete
       onComplete?.(flowData)
+      pendo.track('onboarding_completed', {
+        character_name: flowData.characterName || '',
+        lesson: flowData.lesson || '',
+        genre: flowData.genre || '',
+      })
     }
   }, [currentStep, goToStep, onComplete, flowData])
 

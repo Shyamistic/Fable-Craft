@@ -221,6 +221,10 @@ export default function CollaborativeMode({
             status: 'waiting',
           })
           setPhase('waiting')
+          pendo.track('collaborative_room_created', {
+            room_code: code,
+            player_name: playerName,
+          })
           break
         }
 
@@ -254,6 +258,11 @@ export default function CollaborativeMode({
             )
           }
           setPhase('playing')
+          pendo.track('collaborative_session_started', {
+            room_code: msg.room_code || roomCode || '',
+            player_number: msg.player_number || 0,
+            player_name: playerName,
+          })
           break
         }
 
@@ -319,6 +328,10 @@ export default function CollaborativeMode({
           )
           setPhase('complete')
           setWaitingMessage('')
+          pendo.track('collaborative_quest_completed', {
+            room_code: roomCode || '',
+            total_coins: totalCoins,
+          })
           break
         }
 
@@ -332,6 +345,9 @@ export default function CollaborativeMode({
           setPhase('disconnected')
           setSession((prev) => (prev ? { ...prev, status: 'solo' } : prev))
           setWaitingMessage('')
+          pendo.track('collaborative_partner_disconnected', {
+            room_code: roomCode || '',
+          })
           break
         }
 
@@ -409,6 +425,11 @@ export default function CollaborativeMode({
       status: 'waiting',
     })
     setPhase('playing')
+    pendo.track('collaborative_room_joined', {
+      room_code: joinCode,
+      player_number: 2,
+      player_name: playerName,
+    })
   }
 
   /** Send an answer to the server. */

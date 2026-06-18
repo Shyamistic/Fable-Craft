@@ -84,6 +84,7 @@ const DrawingCanvas = forwardRef<DrawingCanvasHandle, DrawingCanvasProps>(
     const [showStickers, setShowStickers] = useState(false)
     const [stickerMode, setStickerMode] = useState<Sticker | null>(null)
     const segmentCountRef = useRef(0)
+    const drawingStartedTrackedRef = useRef(false)
 
     // ─── Canvas Initialization ─────────────────────────────────────────────
     useEffect(() => {
@@ -183,6 +184,13 @@ const DrawingCanvas = forwardRef<DrawingCanvasHandle, DrawingCanvasProps>(
 
       const coords = getCanvasCoords(e)
       if (!coords) return
+
+      if (!drawingStartedTrackedRef.current) {
+        drawingStartedTrackedRef.current = true
+        pendo.track('drawing_started', {
+          input_mode: 'draw',
+        })
+      }
 
       // Sticker placement mode
       if (stickerMode) {

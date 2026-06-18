@@ -181,8 +181,16 @@ export default function Page() {
       }
 
       const data = await response.json()
-      setQuestData(data.quest || data)
+      const quest = data.quest || data
+      setQuestData(quest)
       setActiveView('quest')
+      pendo.track('quest_started', {
+        quest_id: quest.id || '',
+        genre: genre,
+        lesson: selectedLesson,
+        character_name: generatedCharacter.name,
+        total_scenes: quest.scenes?.length || 8,
+      })
     } catch (err: any) {
       setError(err.message || 'Failed to create quest. Please try again.')
       console.error('Error creating quest:', err)
@@ -210,6 +218,13 @@ export default function Page() {
         coverImageUrl: questData.scenes?.[0]?.image_url || '',
       })
     }
+
+    pendo.track('quest_completed', {
+      quest_id: questData?.id || '',
+      genre: selectedGenre,
+      lesson: selectedLesson,
+      total_scenes: questData?.scenes?.length || 8,
+    })
 
     setGeneratedCharacter(null)
     setSelectedLesson('')
@@ -608,7 +623,12 @@ export default function Page() {
 
                 {/* Character Gallery */}
                 <button
-                  onClick={() => setActiveView('gallery')}
+                  onClick={() => {
+                    pendo.track('gallery_opened', {
+                      character_count: getPersistedGallery().length,
+                    })
+                    setActiveView('gallery')
+                  }}
                   className="relative overflow-hidden rounded-[32px] p-10 text-center transition-all hover:scale-[1.02] focus:outline-none focus:ring-4 group"
                   style={{
                     background: `linear-gradient(145deg, ${BRAND_COLORS.tertiary}, ${BRAND_COLORS.info})`,
