@@ -1,130 +1,258 @@
-# Fablecraft
+<p align="center">
+  <img src="frontend/public/logo-placeholder.svg" alt="Fablecraft Logo" width="80" />
+</p>
 
-**Fablecraft** transforms a child's drawing into a narrated, illustrated 8-scene quest (story adventure), augmenting imagination with Generative AI. Children draw characters, watch them come to life, and play through interactive stories that teach life lessons and values.
+<h1 align="center">Fablecraft</h1>
 
----
+<p align="center">
+  <strong>Turn your child's drawings into AI-powered interactive story adventures that teach real life lessons.</strong>
+</p>
 
-## Try Fablecraft Live
-
-You can access the hosted version of **Fablecraft** here:  
-[Open Fablecraft Web App](#) *(deployment URL will be added after deploy)*
-
-> **Best viewed on:** Desktop or iPad (tablet and desktop viewports 768px–1920px).
-
-### Runtime Notes
-- Character generation: ~15 seconds
-- Quest generation: ~2.5 minutes
-  _(Actual times may vary depending on model loads and network conditions.)_
+<p align="center">
+  <a href="http://54.88.159.186:3000">🔗 Live Demo</a> •
+  <a href="https://youtu.be/Ue89uc2zHyU">🎬 Video</a> •
+  <a href="https://devpost.com/software/fablecraft">📋 Devpost</a>
+</p>
 
 ---
 
-## High-Level System Overview
+## The Problem
 
-Fablecraft consists of two main components:
+Kids spend 3+ hours daily on screens — but almost none of it is creative. They watch, scroll, and tap — but rarely **create**. Every parent feels this tension.
 
-- **Next.js Frontend (UI Service):** Built for the browser, the interface lets children draw directly on a digital canvas — whether on a tablet or a computer. They can also upload photos of their favorite toys, stuffed animals, or hand-drawn art to turn them into story characters.
-- **FastAPI Backend (Agents Service):** The backend orchestrates multiple AI services — Vision Analyzer, Quest Engine, Character Generator, Scene Illustrator — to generate characters, stories, and illustrations.
-
-An optional **Text-to-Speech** endpoint provides narrated playback using Amazon Polly Neural voices.
+**Fablecraft asks:** What if a 5-year-old's drawing session could become a personalized AI storybook that teaches them about sharing, honesty, or being brave?
 
 ---
 
-## Cloud Deployment Surfaces
+## How It Works
 
-| Component | Technology | Deployment | Purpose |
-|-----------|------------|------------|---------|
-| **Frontend** | Next.js | AWS Amplify | Drawing canvas, story flow UI |
-| **Backend** | FastAPI | ECS Fargate | Orchestrates AI services |
-| **Media** | Amazon S3 + CloudFront | – | Stores all uploads & generated assets |
-| **AI Services** | Amazon Bedrock (Claude + Titan/Stability) & Amazon Polly | – | Drawing analysis, story generation, image synthesis, narrations |
+<p align="center">
+  <img src="docs/pictures/Screenshot (5235).png" alt="Character Generation" width="700" />
+  <br/>
+  <em>A child's drawing transformed into an AI-animated character</em>
+</p>
 
-The frontend and backend are containerized with dedicated **Dockerfiles** and deployable on AWS infrastructure. Runtime dependencies include **Amazon S3**, **Amazon Bedrock**, and **Amazon Polly**.
+| Step | What Happens | AI Behind It |
+|------|-------------|--------------|
+| 🖌️ **Draw** | Child draws on canvas or uploads a photo | — |
+| ✨ **Generate** | AI creates an animated character | Vision AI + Image Generation |
+| 📖 **Learn** | Pick a life lesson (sharing, kindness, courage...) | Content Moderation |
+| 🌍 **Explore** | Choose a world: Fantasy, Space, Underwater, Jungle | — |
+| 🎮 **Play** | 8-scene interactive quest with choices | LLM Story Generation |
+| 🔊 **Listen** | AI narrates every scene aloud | Neural Text-to-Speech |
 
 ---
 
-## How the Workflow Works
+## Content Safety — Built for Kids
 
-Transforming a child's character and lesson into a fully illustrated, interactive picture book is a complex process divided into specialized services.
+Fablecraft blocks inappropriate content automatically. If a child draws something unsuitable, the AI catches it and responds with a gentle, child-friendly message.
 
-### 1. Creating Your Character (Vision Analyzer + Character Generator)
+<p align="center">
+  <img src="docs/gifs/aikill.gif" alt="Content Safety" width="700" />
+  <br/>
+  <em>Content moderation in action — keeping the experience safe and friendly</em>
+</p>
 
-When a child finishes their drawing and hits "Generate Character":
+---
 
-1. The frontend sends the base64-encoded drawing and a session ID to the `/api/characters/generate` endpoint.
-2. The backend uploads the image to **Amazon S3** and runs **Vision Analysis** via Amazon Bedrock Claude.
-3. The Vision Analyzer extracts character attributes (type, colors, style, mood) and checks content safety.
-4. The Character Generator produces a child-friendly animated character image via Bedrock image generation.
-5. The response includes structured character data and CDN URLs for both images.
+## System Architecture
 
-### 2. Choosing a Lesson & Genre
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                      FABLECRAFT ARCHITECTURE                     │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌────────────────┐          ┌────────────────────────────────┐ │
+│  │   Frontend     │  REST    │       Backend (FastAPI)         │ │
+│  │   Next.js 14   │ ──────►  │                                │ │
+│  │   React 18     │          │  ┌───────────┐  ┌───────────┐ │ │
+│  │   TypeScript   │          │  │  Vision   │  │   Quest   │ │ │
+│  │   Tailwind CSS │          │  │ Analyzer  │  │  Engine   │ │ │
+│  └────────────────┘          │  └─────┬─────┘  └─────┬─────┘ │ │
+│         │                    │        │               │       │ │
+│  ┌──────▼───────┐           │  ┌─────▼─────┐  ┌─────▼─────┐ │ │
+│  │ Gamification │           │  │ Character │  │   Scene   │ │ │
+│  │ • XP/Levels  │           │  │ Generator │  │Illustrator│ │ │
+│  │ • Streaks    │           │  └─────┬─────┘  └─────┬─────┘ │ │
+│  │ • Achieve.   │           │        │               │       │ │
+│  └──────────────┘           │  ┌─────▼───────────────▼─────┐ │ │
+│                              │  │       AI Services          │ │ │
+│  ┌──────────────┐           │  │  • Amazon Bedrock (Claude) │ │ │
+│  │    Audio     │           │  │  • Gemini (Image Gen)      │ │ │
+│  │ • Music/SFX  │           │  │  • ClipDrop (Stability)    │ │ │
+│  │ • TTS Duck   │           │  │  • Amazon Polly (TTS)      │ │ │
+│  └──────────────┘           │  └─────────────┬─────────────┘ │ │
+│                              │                │               │ │
+│                              │  ┌─────────────▼─────────────┐ │ │
+│                              │  │       Amazon S3            │ │ │
+│                              │  │    (Asset Storage)         │ │ │
+│                              │  └───────────────────────────┘ │ │
+│                              └────────────────────────────────┘ │
+│                                                                  │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │                  Novus.ai (Analytics)                      │   │
+│  │   Auto-instrumented • 8 Product Areas • 2 Personas        │   │
+│  │   5 Key Flows • Session Replay • Zero manual tagging      │   │
+│  └──────────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────┘
+```
 
-The child (or parent) selects one of 12+ predefined life lessons (sharing, kindness, honesty, etc.) or types a custom lesson. They also pick a story genre (Fantasy Kingdom, Outer Space, Underwater World, Jungle Safari).
+### Component Breakdown
 
-### 3. Quest Generation (Quest Engine + Scene Illustrator)
-
-1. The frontend sends character metadata, lesson, and genre to `/api/quests/generate`.
-2. The **Quest Engine** (powered by Amazon Bedrock Claude) generates an 8-scene interactive story with questions and choices.
-3. The **Scene Illustrator** produces storybook-style illustrations for each scene in batches.
-4. The complete quest is rendered in the frontend UI as an interactive picture book.
-
-### 4. Adding Narration with Text-to-Speech (Optional)
-
-To make stories more immersive and accessible:
-
-1. The frontend sends story text to `/api/tts/synthesize`.
-2. The backend invokes **Amazon Polly Neural** to generate child-friendly MP3 narration.
-3. The audio file is stored in S3, and the returned URL enables scene-by-scene playback.
+| Component | Technology | Purpose |
+|-----------|-----------|---------|
+| **Frontend** | Next.js 14, React 18, TypeScript, Tailwind CSS | Drawing canvas, story UI, gamification |
+| **Backend** | FastAPI, Python, Pydantic | AI orchestration, content safety, API |
+| **AI (Text)** | Amazon Bedrock (Claude, Nova Pro/Lite) | Vision analysis, story generation, moderation |
+| **AI (Images)** | Gemini 2.5 Flash, ClipDrop (Stability AI) | Character & scene illustration |
+| **AI (Voice)** | Amazon Polly (Neural/Generative) | Text-to-speech narration |
+| **Storage** | Amazon S3 | All generated assets |
+| **Analytics** | Novus.ai (Pendo) | Auto-instrumented user behavior |
+| **Hosting** | AWS EC2 | Production deployment |
 
 ---
 
 ## Features
 
-- 🎨 **Drawing Canvas** — Freehand drawing with 20 colors, adjustable brush, eraser, undo
-- 📷 **Image Upload** — Upload PNG, JPG, or WEBP images up to 5 MB
-- 🤖 **AI Character Generation** — Turn drawings into animated characters
-- 📖 **Interactive Quests** — 8-scene stories with questions and choices
-- 🎓 **Life Lessons** — 12+ predefined lessons plus custom lesson support
-- 🌍 **Story Genres** — 4 themed worlds for different adventures
-- 🔊 **Text-to-Speech** — Optional narrated playback for all story text
-- 🖼️ **Character Gallery** — Save and reuse up to 50 characters
-- 👨‍👩‍👧 **Parent Dashboard** — PIN-protected stats and progress tracking
-- 👫 **Collaborative Mode** — Two children play through a shared story quest
-- 📊 **Analytics** — Novus.ai integration for anonymous engagement tracking
-- ♿ **Accessible** — COPPA-compliant, responsive, child-safe content filtering
+### For Children (ages 4-8)
+
+- 🎨 **Drawing Canvas** — Magic brushes (rainbow, sparkle, glow, neon), stickers, undo
+- 🤖 **AI Character Generation** — Every scribble becomes a real animated character
+- 📖 **Interactive Quests** — 8 scenes with questions, choices, and life lessons
+- 🔊 **Read-Aloud Narration** — AI reads the story so pre-readers can play independently
+- ⭐ **Stars & Rewards** — Earn coins for correct answers
+- 🏆 **Achievements** — 10 unlockable badges ("First Masterpiece", "World Traveler", "Perfect Score")
+- 🔥 **Daily Streaks** — Encourages regular creative play
+- 🗺️ **Adventure Map** — Visual progress across 4 story worlds
+- 📚 **Bookshelf** — History of all completed stories
+- 🎵 **Genre Music** — Background tracks change per story world
+
+### For Parents
+
+- 🔒 **PIN-Protected Dashboard** — See progress without child access
+- 📊 **Progress Tracking** — Quests completed, lessons learned, time spent
+- 🛡️ **Content Safety** — AI blocks violence, weapons, inappropriate content
+- 👫 **Collaborative Mode** — Two kids play through a shared story
 
 ---
 
-## Tech Stack
+## Novus.ai Integration
 
-| Layer | Technology |
-|-------|-----------|
-| Frontend | Next.js 14, React 18, TypeScript, Tailwind CSS |
-| Backend | FastAPI, Python, Pydantic |
-| AI / ML | Amazon Bedrock (Claude, Titan/Stability), Amazon Polly |
-| Storage | Amazon S3, CloudFront CDN |
-| Analytics | Novus.ai SDK |
-| Hosting | AWS Amplify (frontend), ECS Fargate (backend) |
+<p align="center">
+  <img src="docs/pictures/Screenshot (5230).png" alt="Novus Dashboard" width="700" />
+  <br/>
+  <em>Novus auto-instrumented our product — zero manual tagging required</em>
+</p>
+
+Novus connected to our GitHub repository and auto-detected:
+- **8 Product Areas** — Home, Character Creation, Quest Setup, Story Adventure, Gallery, Collaborative Play, Parent Dashboard, Progress & Rewards
+- **2 User Personas** — Child (Primary User), Parent (Oversight User)
+- **5 Key Flows** — End-to-end user journeys
+- **5 Integrations** — Amazon Bedrock, Polly, S3, CloudFront, Novus
 
 ---
 
 ## Getting Started (Local Development)
 
+### Prerequisites
+- Node.js 18+
+- Python 3.11+
+- AWS credentials (Bedrock, S3, Polly access)
+
+### Frontend
+
 ```bash
-# Frontend
 cd frontend
 npm install
 npm run dev
+```
 
-# Backend
+### Backend
+
+```bash
 cd agents_service
 pip install -r requirements.txt
+cp .env.example .env  # Add your API keys
 uvicorn main:app --reload --port 8080
 ```
 
-Set environment variables for AWS credentials, Bedrock model IDs, and S3 bucket name. See `agents_service/config.py` for all configurable values.
+### Environment Variables
+
+See `agents_service/.env.example` for all required configuration:
+- `AWS_REGION` — AWS region for Bedrock/S3/Polly
+- `S3_BUCKET_NAME` — S3 bucket for asset storage
+- `GEMINI_API_KEY` — Google Gemini for image generation
+- `CLIPDROP_API_KEY` — ClipDrop/Stability AI for character images
+- `OPENROUTER_API_KEY` — Fallback LLM provider
+
+---
+
+## Production Deployment
+
+### Docker (Backend)
+
+```bash
+cd agents_service
+docker build -t fablecraft-backend .
+docker run -d -p 8080:8080 --env-file .env --name backend fablecraft-backend
+```
+
+### Next.js Standalone (Frontend)
+
+```bash
+cd frontend
+NEXT_PUBLIC_API_URL=http://your-backend:8080 npm run build
+cp -r public .next/standalone/public
+cp -r .next/static .next/standalone/.next/static
+PORT=3000 node .next/standalone/server.js
+```
+
+---
+
+## Quest Preview
+
+<p align="center">
+  <img src="docs/gifs/gif2-ezgif.com-video-to-gif-converter.gif" alt="Quest in Progress" width="700" />
+  <br/>
+  <em>Interactive 8-scene quest with AI-generated illustrations</em>
+</p>
+
+---
+
+## Tech Stack
+
+```
+Frontend:    Next.js 14 • React 18 • TypeScript • Tailwind CSS
+Backend:     FastAPI • Python • Pydantic
+AI (Text):   Amazon Bedrock (Claude, Nova Pro/Lite)
+AI (Images): Gemini 2.5 Flash • ClipDrop (Stability AI)
+AI (Voice):  Amazon Polly (Neural/Generative)
+Storage:     Amazon S3
+Analytics:   Novus.ai (auto-instrumented)
+Hosting:     AWS EC2
+```
+
+---
+
+## What's Next
+
+- 🎨 Character customization with AI suggestions
+- 📄 Story export as printable PDF
+- 🎬 Animated scenes via video AI
+- 📊 Difficulty levels (Easy/Medium/Advanced)
+- 🎃 Seasonal content (Halloween, holidays)
 
 ---
 
 ## License
 
 MIT
+
+---
+
+<p align="center">
+  Built with ❤️ for World Product Day 2026<br/>
+  <a href="http://54.88.159.186:3000">Try Fablecraft</a> •
+  <a href="https://youtu.be/Ue89uc2zHyU">Watch Demo</a> •
+  <a href="https://www.novus.ai">Powered by Novus.ai</a>
+</p>
